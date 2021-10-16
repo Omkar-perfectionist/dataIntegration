@@ -43,3 +43,42 @@ private class ProjectCalloutServiceTest {
         
         System.assertEquals('Resubmit Project', oppList[0].StageName);
     }
+       @isTest
+    static void testPMSCalloutSuccess(){
+        
+        Test.startTest();
+        List<Opportunity>opplist=[SELECT ID, Name, Account.Name,CloseDate, Amount
+                                                   FROM Opportunity
+                                                   WHERE Name='Test Opp'];
+        if(oppList != Null)
+        {
+        for(Opportunity opp1 : oppList){
+            //opp1.StageName = 'Submitted Project';
+            
+            Test.setMock(HttpCalloutMock.class, new ProjectCalloutServiceMock());
+            
+            ProjectCalloutService.makeCallout(opp1,'ProjectServiceToken');
+            //update opp1;
+        }
+        } 
+        Test.stopTest();
+        
+       // opportunities = [SELECT StageName FROM Opportunity WHERE Name = 'Test Opp'];
+        System.assertEquals('Submitted Project', oppList[0].StageName);
+    }
+    
+    @isTest
+    static void testOtherMeth()
+    {
+         List<Opportunity>opplist=[SELECT ID, Name, Account.Name,CloseDate, Amount
+                                                   FROM Opportunity
+                                                   WHERE Name='Test Opp'];
+      
+       List<Id> oppId=new List<Id>();
+       oppId.add(opplist[0].id);
+       
+        Test.setMock(HttpCalloutMock.class, new ProjectCalloutServiceMock());
+        ProjectCalloutService.postOpportunityToPMS(oppId);
+    }
+    
+}
