@@ -1,0 +1,18 @@
+public class CalloutInformationWrapper{
+        String opportunityId;
+        String opportunityName;
+        String accountName;
+        String closeDate;
+        Decimal amount;
+        
+       public CalloutInformationWrapper(Opportunity opp)
+       {
+           this.opportunityId = opp.Id;
+            this.opportunityName = opp.Name;
+            this.accountName = opp.Account.Name;
+            this.closeDate = String.valueOf(opp.CloseDate);
+            this.amount = opp.Amount;
+           
+       }
+    }
+ 
