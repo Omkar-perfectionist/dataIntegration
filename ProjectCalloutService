@@ -1,3 +1,22 @@
+public class ProjectCalloutService {
+    //Complete the implementation for business and callout logic
+	public static final String PROJECT_SERVICE_TOKEN_NAME = 'ProjectServiceToken';
+    @invocableMethod
+    public static void postOpportunityToPMS(List<Id>opportunityIds){
+        if(opportunityIds.size() >0)
+        {
+            System.enqueueJob(new QueueablePMSCall(opportunityIds));
+        }
+    }
+    
+    public class QueueablePMSCall implements System.Queueable, Database.AllowsCallouts{   
+        
+         List<Id> opportunitiyIdsToProcess;
+        public QueueablePMSCall(List<Id> opportunitiyIds)
+        {
+            opportunitiyIdsToProcess=opportunitiyIds;
+        }
+
 public class CalloutInformationWrapper{
         String opportunityId;
         String opportunityName;
@@ -15,4 +34,4 @@ public class CalloutInformationWrapper{
            
        }
     }
- 
+ }
