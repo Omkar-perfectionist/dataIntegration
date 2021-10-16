@@ -16,6 +16,25 @@ public class ProjectCalloutService {
         {
             opportunitiyIdsToProcess=opportunitiyIds;
         }
+	
+	public void execute (System.QueueableContext context)
+        {
+            collectDataAndCallOut(opportunitiyIdsToProcess);
+        }
+        
+    }
+    
+   public static void collectDataAndCallOut(List<Id> opportunitiyIds){
+        
+      List<Opportunity>opportunitiesToProcess =[SELECT ID, Name, Account.Name,CloseDate, Amount
+                                                   FROM Opportunity
+                                                   WHERE Id In :opportunitiyIds];
+        if(opportunitiesToProcess.size() > 0)
+        {
+            
+            makeCallout(opportunitiesToProcess[0]);
+        }
+    }
 
 public class CalloutInformationWrapper{
         String opportunityId;
