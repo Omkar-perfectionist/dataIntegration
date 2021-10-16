@@ -1,0 +1,45 @@
+@isTest
+private class ProjectCalloutServiceTest {
+  
+    @testSetup
+    static void setup(){
+        ServiceTokens__c token = new ServiceTokens__c();
+        token.Name = ProjectCalloutService.PROJECT_SERVICE_TOKEN_NAME;
+        token.Token__c = 'TestToken';
+        insert token;
+        
+        Account acc = new Account();
+        acc.Name = 'Test Account';
+        insert acc;
+        
+        Opportunity opp = new Opportunity();
+        opp.AccountId = acc.Id;
+        opp.Name = 'Test Opp';
+        opp.Type = 'New Project';
+        opp.CloseDate = Date.today();
+        opp.StageName = 'Prospecting';
+        opp.Amount = 100000;
+        insert opp;
+    }
+    
+    @isTest
+    static void testPMSCalloutFailure(){
+        Test.startTest();
+        List<Opportunity>opplist=[SELECT ID, Name, Account.Name,CloseDate, Amount
+                                                   FROM Opportunity
+                                                   WHERE Name='Test Opp'];
+     
+        if(oppList != Null)
+        {
+        for(Opportunity opp1 : oppList){
+        
+            Test.setMock(HttpCalloutMock.class, new ProjectCalloutServiceMockFailure());
+            
+            ProjectCalloutService.makeCallout(opp1,'ProjectServiceToken');
+            //update opp1;
+        }
+        } 
+        Test.stopTest();
+        
+        System.assertEquals('Resubmit Project', oppList[0].StageName);
+    }

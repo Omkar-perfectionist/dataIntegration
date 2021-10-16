@@ -19,8 +19,28 @@ public class ProjectCalloutService {
 	
 	public void execute (System.QueueableContext context)
         {
-            collectDataAndCallOut(opportunitiyIdsToProcess);
+            collectDataAndCallOut(opportunitiyIdsToProcess,ServiceTokens__c.getInstance(PROJECT_SERVICE_TOKEN_NAME).Token__c);
         }
+        
+    }
+    public static void makeCallout(Opportunity opp ,String projectServiceToken)
+    {
+      Http http=new Http();
+      HttpRequest request=new HttpRequest();
+      request.setMethod('POST');
+      request.setHeader('Content-Type', 'application/json');
+      request.setHeader('token', projectServiceToken);
+      request.setEndpoint('callout:ProjectService');
+        request.setBody(JSON.serialize(new CalloutInformationWrapper(opp)));
+        HttpResponse response=http.send(request);
+         if(response.getStatusCode() == 201 && response.getStatus() == 'OK'){
+            opp.StageName = 'Submitted Project';
+        }
+        else if(response.getStatusCode() == 500){
+            opp.StageName = 'Resubmit Project';
+        }
+        
+        update opp; 
         
     }
     
